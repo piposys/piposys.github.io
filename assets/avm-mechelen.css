@@ -1,0 +1,276 @@
+/* Mechelen specific
+
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
+
+body, html, button {
+  font-family: "Open Sans", sans-serif !important;
+  font-optical-sizing: auto;
+  font-size: 1.6rem;
+}
+*/
+
+// MARGIN BETWEEN FORM COMPONENTS -----------------------------------------------------------------------------------
+// add margin between components, so it's not so cluttered anymore.
+
+.vl-form-grid, .vo-address, .notification-component, .guidefileupload, .info-tile-component, .guideimage, body form .guidetermsandconditions.guidefield, .tabbedPanelLayout, .guideseparator, .accordion, .wizard, .guideVerticalTabbedPanelLayout {
+	margin-bottom: 30px;
+}
+.vo-address .vl-form-grid {
+	margin-bottom: 10px;
+}
+.guideFileUpload .vl-form-grid {
+	margin-bottom: 0;
+}
+
+// add some bottom margin to the buttons (if you place things under the buttons, like a disclaimer)
+.submit, .toolbar, .guidebutton {
+	margin-bottom: 30px;
+}
+.toolbar .submit, .toolbar .vue-component, .guidebutton .vue-components, .toolbar .guidebutton {
+	margin-bottom: 0;
+}
+
+// TYPOGRAPHY -----------------------------------------------------------------------------------
+// If you use only a title in a text component, don't add bottom margin (we added them above between the components)
+
+.vl-typography > div > *:last-child, .vl-typography > div > *:only-child {
+	margin-bottom: 0;
+}
+
+// Form title has too much bottom margin
+.guidetextdraw.afFormTitle #guideContainer-rootPanel-afformtitle__ h2 {
+	margin-bottom: 0;
+}
+
+// ERRORS -----------------------------------------------------------------------------------
+// gives some margins to put it right (negative margin is to put it closer to the label)
+.vl-form__error, .vl-form__success {
+    margin: -.5rem 0 .5rem;
+}
+
+// STEPS -----------------------------------------------------------------------------------
+// fixes the progress bar steps issues: clipped text, weird alignment...
+
+.progress-bar-holder {
+	margin: 0 0 30px;
+}
+
+.vl-progress-bar.vl-progress-bar--numeric {
+	display: flex;
+	justify-content: flex-start;
+	height: auto;
+	align-items: flex-start;
+}
+// no labels on mobile
+@media screen and (max-width: 767px) {
+	.vl-progress-bar.vl-progress-bar--numeric {
+		justify-content: center;
+	}
+	.vl-progress-bar.vl-progress-bar--numeric .vl-progress-bar__step {
+		flex-grow: 1;
+	}
+}
+.vl-progress-bar.vl-progress-bar--numeric .vl-progress-bar__step {
+	display: flex;
+	justify-content: center;
+	flex: 1;
+}
+.vl-progress-bar.vl-progress-bar--numeric .vl-progress-bar__step .vl-progress-bar__bullet {
+	position: relative;
+	width: auto;
+	background: transparent;
+	border: none;
+	border-radius: 0;
+	display: flex;
+	justify-content: center;
+	flex-direction: column;
+	align-items: center;
+	padding: 0 10px;
+	height: auto;
+	transform: none;
+	gap: 5px;
+	right: auto;
+}
+.vl-progress-bar.vl-progress-bar--numeric .vl-progress-bar__step .vl-progress-bar__bullet__text {
+	position: relative;
+	transform: none;
+	max-width: none;
+	overflow: auto;
+	white-space: normal;
+	font-size: 1.4rem;
+}
+.vl-progress-bar.vl-progress-bar--numeric .vl-progress-bar__step .vl-progress-bar__bullet:after {
+	position: relative;
+    width: 3.2rem;
+    height: 3.2rem;
+    text-decoration: none;
+    border-radius: 50%;
+    order: -1;
+    background-color: #cfd5dd;
+    border-color: #cfd5dd;
+    font-size: 1.6rem;
+}
+.vl-progress-bar.vl-progress-bar--numeric .vl-progress-bar__step--active .vl-progress-bar__bullet:after {
+    background-color: var(--vl-theme-primary-color);
+    border-color: var(--vl-theme-primary-color);
+}
+// line between steps
+.vl-progress-bar.vl-progress-bar--numeric .vl-progress-bar__step:before {
+	height: 2px;
+	left: 0;
+	right: 0;
+	top: calc(1.6rem - 1px);
+    background-color: #cfd5dd;
+}
+// no left line on first item
+.vl-progress-bar.vl-progress-bar--numeric .vl-progress-bar__step:first-child:before {
+	left: 50%;
+}
+// no right line at last item
+.vl-progress-bar.vl-progress-bar--numeric .vl-progress-bar__step:last-child:before {
+	right: 50%;
+}
+
+// CONTAINER IN STEPS -----------------------------------------------------------------------------
+// fixes the width of the container in steps
+
+.afWizardPanel {
+	width: 100%;
+}
+
+// ACCORDEON STEPS -----------------------------------------------------------------------------
+// fixes alignment adn whitespace of the accordeon and the items in it.
+
+body form .accordion-navigators .vl-accordion__wrapper a {
+	padding: 1rem;
+}
+body form .afAccordionPanel {
+	padding: 2rem 2rem 0 3.5rem;
+}
+.vl-accordion__summary {
+	margin: 0;
+}
+
+// make sure the link gets full width (mobile)
+.vl-accordion__summary .vl-toggle.vl-link {
+	display: flex;
+}
+.vl-accordion__summary .vl-toggle.vl-link .vl-accordion__icon {
+	top: 6px;
+	flex: 0 0 30px;
+}
+
+
+// LEFT TABS STEPS -----------------------------------------------------------------------------
+// changes from default gray/black to theme colors.
+
+.guide-tab-stamp-list > ul > li > a,
+.guide-tab-stamp-list > ul > li.stepped > a,
+.guide-tab-stamp-list > ul > li> a:hover {
+    background-color: transparent;
+    color: var(--vl-theme-fg-color);
+}
+.guide-tab-stamp-list > ul >  li.active > a {
+    background-color: var(--vl-theme-primary-color);
+    color: var(--vl-theme-fg-color);
+}
+
+// adds whitespace between tabs and tab content on different screen widths
+@media screen and (min-width: 992px) {
+	.guide-tab-stamp-list + .afTabLeftPanel > * {
+		padding-left: 2rem;
+		border-left: solid 1px #cfd5dd;
+	}
+}
+@media screen and (min-width: 768px) and (max-width: 991px) {
+	.guide-tab-stamp-list + .afTabLeftPanel > * {
+		padding-top: 2rem;
+	}
+}
+
+// let text get on more lines if too long
+.guide-tab-stamp-list > ul.tab-navigators {
+	white-space: normal;
+}
+.guide-tab-stamp-list > ul > li > a {
+	margin: 0;
+}
+
+// LABELS -----------------------------------------------------------------------------------
+// give some space to the longer labels 
+
+.vl-form__label {
+	line-height: 1.4;
+}
+
+// RADIO & CHECK -----------------------------------------------------------------------------------
+// remove some whitespace between radio and checkboxes
+
+.rootPanel .checkbox-holder .vl-checkbox--block, 
+.rootPanel .radio-holder .vl-radio--block {
+	margin: 0 0 2px;
+}
+
+// EMAIL CONFIRMATION FIELD -----------------------------------------------------------------------------------
+// add some whitespace to the e-mailfield when clicked open
+
+.notification-component .vl-checkbox + input {
+	margin-top: 10px;
+	margin-left: 28px;
+	width: calc(100% - 30px);
+}
+
+// TERMS AND CONDITIONS -----------------------------------------------------------------------------------
+// Don't use extra padding. Above spacing rules fixes this already.
+body form .guideTermsAndConditions {
+	padding: 0;
+}
+
+// FILE UPLOAD -----------------------------------------------------------------------------------
+// smaller font size for the file name and better alignment of elements 
+
+.guideFileUpload .afFileUpload .guide-fu-fileItemList .guide-fu-fileItem {
+	padding: 10px 25px;
+	position: relative;
+}
+.guideFileUpload .afFileUpload .guide-fu-fileItemList .guide-fu-fileItem:before {
+	left: 0;
+	transform: none;
+}
+.guideFileUpload .afFileUpload .guide-fu-fileItemList .guide-fu-fileItem .close {
+	position: absolute;
+	right: 0;
+	top: 10px;
+}
+.guideFileUpload .afFileUpload .guide-fu-fileItemList .guide-fu-fileItem .guide-fu-fileName {
+	font-size: 0.8em;
+	display: block;
+	padding-left: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	line-height: 27px;
+}
+div.guide-fu-comment {
+	padding: 5px 10px;
+	margin: 5px -10px;
+}
+
+@media screen and (max-width: 767px) {
+	.guideFileUpload .afFileUpload {
+		padding: 1rem;
+	}
+}
+
+// BUTTONS -----------------------------------------------------------------------------------
+// make a slightly bigger button
+
+.vl-button, .vl-button:active, .vl-button:hover {
+    min-height: 5rem;
+    padding: .6rem 2.2rem;
+    cursor: pointer;
+}
+
+// border jumps when hovering, because of the different border-widths
+.vl-button--tertiary {
+	border-width: .2rem;
+}
