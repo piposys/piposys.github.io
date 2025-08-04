@@ -1,0 +1,1458 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Basisregisters Vlaanderen Verenigingsregister Publieke API",
+    "description": "\n---\nHet Verenigingsregister verstrekt informatie over verenigingen die in interactie treden met een overheid (in het kader van dienstverlening).\n<br />Het betreft verenigingen zonder rechtspersoonlijkheid (zoals feitelijke verenigingen) en verenigingen met rechtspersoonlijkheid (zoals vzw’s).\n\nDeze API geeft *enkel leesrechten* tot de informatie uit het Verenigingsregister.\nVoor meer algemene informatie over het gebruik van deze API, raadpleeg onze [publieke confluence pagina](https://vlaamseoverheid.atlassian.net/wiki/spaces/AGB/pages/6264358372/Technische+documentatie).\n\nSchrijf je in op <a href=\"https://analytics-eu.clickdimensions.com/cn/aqwrf/InVereniging\">onze nieuwsbrief</a> om op de hoogte te blijven met informatie en nieuwigheden over het verenigingsregister.\n# Toegang tot het register\n## Basis-URL\n\nDe REST API van Basisregisters Vlaanderen is te bereiken via volgende basis-URL.\n\nDoelpubliek | REST basis-URL                                                    |\n----------- | ----------------------------------------------------------------- |\nIedereen    | https://publiek.verenigingen.staging-vlaanderen.be |\n\n## Gebruik API Keys\n\nOm gebruik te kunnen maken van deze API, is het noodzakelijk een API Key aan te vragen via [dit formulier](https://dynamicforms.crmiv.vlaanderen.be/DynamicForms/Page/Show/CfDJ8GPktGo7Wz5OkeXsfMuUHKXpydc51r8YGKFTny_81HI4MAk-UPEZPRE-C5vLrsIwGoqY04LvvVzco4kBATIPBVrJuq94RsO6BXkh-wBDsSxt9eQqpgkkjiyjUppidw8yLjEbddbIVC2s1j22GGWsy2kxZN5ElBbNCqGxdLOi6JE7HP3URfn3vVaXSDy4BzwZUmeo%2FlHrFON3G705Za46PFlO69PBZAOkpZmUcYyjt-e7S?path=APIKeyVR)\n\nNa het verkrijgen van de API Key, dient deze meegestuurd te worden als header, of via de query parameters.\n\nType | Naam | Voorbeeld                                                    |\n----------- | ----------------------------------------------------------------- |----|\nHeader    | `vr-api-key` | `curl --request GET --url 'https://publiek.verenigingen.staging-vlaanderen.be/v1/hoofdactiviteitenVerenigingsloket' --header 'vr-api-key: api-key'`|\nQuery parameter | `vr-api-key` | https://publiek.verenigingen.staging-vlaanderen.be/v1/hoofdactiviteitenVerenigingsloket?vr-api-key=api-key |\n\nAlle endpoints in de secties contexten, parameters en mutatiedienst zijn beschikbaar zonder api key. Je hebt dus enkel en API key nodig voor het opvragen van verenigingen.\n\n## Gebruik API Versies\nOm gebruik te kunnen maken van een andere API versie, is het noodzakelijk een API versie mee te geven.\n\nDeze dienen meegestuurd te worden als header, of via de query parameters.\n\nOm gebruik te maken van de v1, geef je geen api versie mee.\n\nJe kan bepalen of een endpoint meerdere versies ondersteunt, door de aanwezigheid van de request header `vr-api-key` bij de documentatie van dat endpoint.\n\nMogelijke waarden zijn:\n* v2 – in deze versie wordt het verenigingstype omgezet van `FV - Feitelijke vereniging` naar `VZER - Vereniging zonder eigen rechtspersoonlijkheid`.\n\n| Type            | Naam             | Voorbeeld                                                                                                                                                       |\n|-----------------|------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------|\n| Header          | `vr-api-version` | `curl --request GET --url 'https://publiek.verenigingen.staging-vlaanderen.be/v1/verenigingen' --header 'vr-api-version: v2'`                      |\n| Query parameter | `vr-api-version` | https://publiek.verenigingen.staging-vlaanderen.be/v1/verenigingen?vr-api-version=v2                                                                   |\n\n### Wijzigingen in v2\n\nSinds de release van v2 werden bestaande verenigingen van het type FV-feitelijke vereniging omgezet naar VZER-vereniging zonder eigen rechtspersoonlijkheid.\nDe verenigingen krijgen door deze migratie 2 extra velden, namelijk `subverenigingVan` en `verenigingssubtype`.\n\nVerenigingen zonder eigen rechtspersoonlijkheid die na deze migratie aangemaakt zijn, zullen automatisch dit nieuwe type toegewezen krijgen,\nen krijgen als verenigingssubtype standaard de waarde `Niet bepaald`.\n\nBij het opvragen van deze verenigingen zonder de v2-header, worden echter nog steeds de velden en semantiek van v1 gehanteerd.\n\n# Foutmeldingen\n\nDe Basisregisters Vlaanderen API gebruikt [Problem Details for HTTP APIs (RFC7807)](https://tools.ietf.org/html/rfc7807) om foutmeldingen te ontsluiten. Een foutmelding zal resulteren in volgende datastructuur:\n\n```\n{\n  \"type\": \"string\",\n  \"title\": \"string\",\n  \"detail\": \"string\",\n  \"status\": number,\n  \"instance\": \"string\"\n}\n```\n\n## Mogelijke foutmeldingen\n\nBinnen de aangeboden endpoints zijn er een aantal foutmeldingen die kunnen voorkomen. Het veld ‘Detail’ binnen de response body bevat meer informatie over de foutmelding.\n\nFoutmelding | Wanneer                                                           |\n----------- | ----------------------------------------------------------------- |\n403    |Wanneer er geen API key wordt meegegeven. <br> Wanneer de opgegeven API key niet correct is. |\n404    |Wanneer de resource niet gevonden kan worden. |\n500    |Wanneer er een interne fout is gebeurd. |\n\n",
+    "contact": {
+      "name": "Digitaal Vlaanderen",
+      "url": "https://publiek.verenigingen.vlaanderen.be",
+      "email": "digitaal.vlaanderen@vlaanderen.be"
+    },
+    "license": {
+      "name": "Modellicentie Gratis Hergebruik - v1.0",
+      "url": "https://overheid.vlaanderen.be/sites/default/files/documenten/ict-egov/licenties/hergebruik/modellicentie_gratis_hergebruik_v1_0.html"
+    },
+    "version": "v1",
+    "x-assemblyVersion": "v8.258.0.0 (abcf762a04998e6da3a5abf0ac58889c58d9e160)"
+  },
+  "servers": [
+    {
+      "url": "/docs"
+    },
+    {
+      "url": "http://publiek.verenigingen.staging-vlaanderen.be/"
+    }
+  ],
+  "paths": {
+    "/v1/contexten/publiek/{name}": {
+      "get": {
+        "tags": [
+          "Contexten"
+        ],
+        "summary": "Vraag de JSON-LD context op voor een specifiek object binnen de publieke api",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "description": "Dit is de naam van de specifieke context",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/v1/contexten/beheer/{name}": {
+      "get": {
+        "tags": [
+          "Contexten"
+        ],
+        "summary": "Vraag de JSON-LD context op voor een specifiek object binnen de beheer api",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "description": "Dit is de naam van de specifieke context",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/v1/verenigingen/mutaties": {
+      "get": {
+        "tags": [
+          "Mutatiedienst"
+        ],
+        "summary": "Opvragen gewijzigde VCodes.",
+        "parameters": [
+          {
+            "name": "sinds",
+            "in": "query",
+            "description": "Geeft alle VCodes waarvan de hoogste sequence strikt groter is dan de opgegeven waarde",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Het detail van een vereniging",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssociationRegistry.Public.Api.Verenigingen.Mutaties.PubliekVerenigingSequenceResponse"
+                },
+                "example": [{"vCode":"V0001021","sequence":10},{"vCode":"V0001052","sequence":15}]
+              }
+            }
+          },
+          "500": {
+            "description": "Er is een interne fout opgetreden.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Be.Vlaanderen.Basisregisters.BasicApiProblem.ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/verenigingen/zoeken": {
+      "get": {
+        "tags": [
+          "Opvragen van verenigingen"
+        ],
+        "summary": "Zoek verenigingen op.",
+        "description": "Dit endpoint laat toe verenigingen op te zoeken.\r\nVoor de zoekterm `q` kan je gebruik maken van volledige termen, of gebruik maken van wildcards.\r\n- `q=Liedekerke` zoekt in alle velden naar de volledige term,\r\n- `q=Liedeke*` zoekt in alle velden naar een term die begint met 'Liedeke',\r\n- `q=*kerke` zoekt in alle velden naar een term die eindigt op 'kerke',\r\n- `q=*kerke*` zoekt in alle velden naar een term die 'kerke' bevat.\r\n            \r\nOm te zoeken binnen een bepaald veld, gebruik je de naam van het veld.\r\n- `q=gemeente:Liedekerke`\r\n- `q=korteNaam:DV*`\r\n            \r\nOm te zoeken op een genest veld, beschrijf je het pad naar het veld.\r\n- `q=locaties.postcode:1000`\r\n            \r\nOm te zoeken of een vereniging actief is in een bepaalde regio, kan je gebruik maken van `geotags.identificatie`.\r\nEr kan gezocht worden op zowel postcodes als werkingsgebieden (gemeente- of provincieniveau).\r\n            \r\nBij gebruik van `geotags.identificatie` wordt automatisch rekening gehouden met de hiërarchie van werkingsgebieden:\r\n- Wanneer je een **postcode** opgeeft, worden alle verenigingen met een locatie met deze postcode teruggegeven alsook de verenigingen met het bovenliggende werkingsgebied op gemeenteniveau of het bovenliggende werkingsgebied op provincieniveau.\r\n- Wanneer je een **werkingsgebied op gemeenteniveau** opgeeft, worden alle verenigingen met een locatie met een van de onderliggende postcodes teruggegeven alsook de verenigingen met dit werkingsgebied of het bovenliggende werkingsgebied op provincieniveau.\r\n- Wanneer je een **werkingsgebied op provincieniveau** opgeeft, worden alle verenigingen met een locatie met een van de onderliggende postcodes teruggegeven alsook de verenigingen met een van de onderliggende werkingsgebieden op gemeenteniveau of dit werkingsgebied.\r\n            \r\nVoorbeeld:\r\n- `q=geotags.identificatie:9000` zoekt naar verenigingen met locatie in postcode 9000 of werkingsgebied gemeente Gent of werkingsgebied provincie Oost-Vlaanderen.\r\n- `q=geotags.identificatie:BE23444021` zoekt naar verenigingen met locatie in postcode 9000, 9050,... of werkingsgebied gemeente Gent of werkingsgebied provincie Oost-Vlaanderen.\r\n- `q=geotags.identificatie:BE23` zoekt naar verenigingen met locatie in postcode 9000, 9050, 9500, 9160,... of werkingsgebied gemeente Gent, Geraardsbergen, Lokeren,... of werkingsgebied provincie Oost-Vlaanderen.\r\n            \r\n### Paginatie\r\n            \r\nStandaard gebruiken we een paginatie limiet van 50 verenigingen.\r\nOm een andere limiet te gebruiken, geef je de parameter `limit` mee.\r\nDe maximum limiet die kan gebruikt worden is 1000.\r\n- `q=...&limit=100`\r\n            \r\nOm de volgende pagina's op te vragen, geef je de parameter `offset` mee.\r\n- `q=...&offset=50`\r\n- `q=...&offset=30&limit=30`\r\n            \r\nEr kan enkel gepagineerd worden binnen de eerste 1000 resultaten.\r\nDit betekent dat de som van limit en offset nooit meer kan bedragen dan 1000.\r\n            \r\n### Sortering\r\n            \r\nStandaard wordt aflopend gesorteerd op vCode.\r\nWil je een eigen sortering meegeven, kan je gebruik maken van `sort=veldNaam`.\r\n- Zonder `sort` parameter wordt standaard aflopend gesorteerd op `vCode`.\r\n- `sort=naam` sorteert oplopend op `naam`.\r\n- `sort=-naam` sorteert aflopend op `naam`.\r\n            \r\nOm te zoeken op een genest veld, beschrijf je het pad naar het veld.\r\n- `sort=verenigingstype.code`\r\n            \r\nOm te sorteren op meerdere velden, combineer je de verschillende velden gescheiden door een komma.\r\n- `sort=verenigingstype.code,-naam`\r\n            \r\nDe volgende velden worden ondersteund voor gebruik bij het sorteren:\r\n- `vCode`\r\n- `verenigingstype.code`\r\n- `verenigingstype.beschrijving`\r\n- `roepnaam`\r\n- `naam`\r\n- `korteNaam`\r\n- `doelgroep.minimumleeftijd`\r\n- `doelgroep.maximumleeftijd`\r\n            \r\nHet gedrag van het sorteren op andere velden kan niet gegarandeerd worden.",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "description": "De querystring",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "De velden om op te sorteren",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "facets.hoofdactiviteitenVerenigingsloket",
+            "in": "query",
+            "description": "De hoofdactiviteiten dewelke wel moeten meegenomen met de query, maar\r\nniet in de facets te zien is.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Het aantal items dat overgeslagen zal worden",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Het aantal items dat (maximaal) zal worden opgehaald",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "vR-Api-Version",
+            "in": "header",
+            "description": "De versie van dit endpoint.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Indien de zoekopdracht succesvol was.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssociationRegistry.Public.Api.Verenigingen.Search.ResponseModels.SearchVerenigingenResponse"
+                },
+                "examples": {
+                  "Zonder versie header": {
+                    "value": {"@context":"https://publiek.verenigingen.staging-vlaanderen.be/v1/contexten/publiek/zoek-verenigingen-context.json","verenigingen":[{"@type":"fei:FeitelijkeVerenigingen","vCode":"V0001001","verenigingstype":{"code":"FV","naam":"Feitelijke vereniging"},"naam":"FWA De vrolijke BA’s","korteNaam":"DVB","korteBeschrijving":"Een vrolijke groep van BA'ers die graag BA dingen doen.","hoofdactiviteitenVerenigingsloket":[{"@id":"act:689867a5-ff8c-5081-a39f-fa0e75e227c2","@type":"skos:Concept","code":"CULT","naam":"Cultuur"}],"werkingsgebieden":[{"@id":"wg:beb2fab7-a255-5eac-986c-5363787e5a59","@type":"skos:Concept","code":"BE25","naam":"Provincie West-Vlaanderen"}],"doelgroep":{"@id":"doel:645893be-1cc0-5ec7-bcf6-13cd7f0e1b7d","@type":"verenigingen_ext:Doelgroep","minimumleeftijd":0,"maximumleeftijd":150},"locaties":[{"@id":"loc:6c906ef4-4b99-5e0d-94f2-01459f8bd44e","@type":"org:Site","locatietype":"Correspondentie","isPrimair":true,"adresvoorstelling":"kerkstraat 5, 1770 Liedekerke, België","naam":"","postcode":"1770","gemeente":"Liedekerke"}],"lidmaatschappen":[{"@id":"lidmaatschap:50120f03-e531-5a6d-8d05-431a6712892c","@type":"org:Membership","andereVereniging":"V0001002","van":"2024-08-04","tot":"2025-08-04","identificatie":"L1234","beschrijving":"Gewoon een lid"}],"sleutels":[{"@id":"identificatoren:b309b034-5770-560b-a71e-9f69cffde4b2","@type":"adms:Identifier","bron":"Vcode","waarde":"V0001001","codeerSysteem":"Vcode","gestructureerdeIdentificator":{"@id":"ges:ef70d668-d9b1-5eb5-ae90-d6aabe1d70a3","@type":"generiek:GestructureerdeIdentificator","nummer":"V0001001"}}],"relaties":[],"links":{"detail":"https://publiek.verenigingen.staging-vlaanderen.be/verenigingen/V0001001"}},{"@type":"fei:FeitelijkeVerenigingen","vCode":"V0036651","verenigingstype":{"code":"VZW","naam":"Vereniging zonder winstoogmerk"},"naam":"FWA De Bron","roepnaam":"Bronneke","korteNaam":"","korteBeschrijving":"","hoofdactiviteitenVerenigingsloket":[{"@id":"act:b47fd079-d692-5d91-8657-168aab04b498","@type":"skos:Concept","code":"SPRT","naam":"Sport"}],"werkingsgebieden":[{"@id":"wg:beb2fab7-a255-5eac-986c-5363787e5a59","@type":"skos:Concept","code":"BE25","naam":"Provincie West-Vlaanderen"}],"doelgroep":{"@id":"doel:3948061a-783d-5ffe-9b3e-db6538f8dac8","@type":"verenigingen_ext:Doelgroep","minimumleeftijd":0,"maximumleeftijd":150},"locaties":[{"@id":"loc:097631a2-a376-5ef3-8cfe-9978d3211aa2","@type":"org:Site","locatietype":"Activiteiten","isPrimair":false,"adresvoorstelling":"dorpstraat 91, 9000 Gent, België","naam":"Cursuszaal","postcode":"9000","gemeente":"Gent"}],"lidmaatschappen":[{"@id":"lidmaatschap:50120f03-e531-5a6d-8d05-431a6712892c","@type":"org:Membership","andereVereniging":"V0001002","van":"2024-08-04","tot":"2025-08-04","identificatie":"L1234","beschrijving":"Gewoon een lid"},{"@id":"lidmaatschap:c1ab2496-31b6-570d-aa51-a1ed0b6cb1a3","@type":"org:Membership","andereVereniging":"V0001003","van":"2025-03-04","tot":"2025-07-30","identificatie":"L4321","beschrijving":"Tijdelijk lidmaatschap"}],"sleutels":[{"@id":"identificatoren:643c36bc-28a5-5a74-9adc-cbdcc7268635","@type":"adms:Identifier","bron":"KBO","waarde":"0123456789","codeerSysteem":"KBO nummer","gestructureerdeIdentificator":{"@id":"ges:a492532d-f5af-5359-aefe-9f64b13deb39","@type":"generiek:GestructureerdeIdentificator","nummer":"0123456789"}},{"@id":"identificatoren:8f5fd362-2e38-55b6-a007-d80704e406a8","@type":"adms:Identifier","bron":"Vcode","waarde":"V0036651","codeerSysteem":"Vcode","gestructureerdeIdentificator":{"@id":"ges:590ed586-43aa-50ee-be3d-5acde470410b","@type":"generiek:GestructureerdeIdentificator","nummer":"V0036651"}}],"relaties":[],"links":{"detail":"https://publiek.verenigingen.staging-vlaanderen.be/verenigingen/V0036651"}}],"facets":{"hoofdactiviteitenVerenigingsloket":[{"code":"CULT","aantal":1,"query":"https://publiek.verenigingen.staging-vlaanderen.be/verenigingen/search/q=(hoofdactiviteitVerenigingsloket.code:CULT)"},{"code":"SPRT","aantal":1,"query":"https://publiek.verenigingen.staging-vlaanderen.be/verenigingen/search/q=(hoofdactiviteitVerenigingsloket.code:SPRT)"}]},"metadata":{"pagination":{"totalCount":2,"offset":0,"limit":50}}}
+                  },
+                  "Versie 'v2'": {
+                    "value": {"@context":"https://publiek.verenigingen.staging-vlaanderen.be/v1/contexten/publiek/zoek-verenigingen-context.json","verenigingen":[{"@type":"fei:FeitelijkeVerenigingen","vCode":"V0001001","verenigingstype":{"code":"VZER","naam":"Vereniging zonder eigen rechtspersoonlijkheid"},"verenigingssubtype":{"code":"NB","naam":"Niet bepaald"},"naam":"FWA De vrolijke BA’s","korteNaam":"DVB","korteBeschrijving":"Een vrolijke groep van BA'ers die graag BA dingen doen.","hoofdactiviteitenVerenigingsloket":[{"@id":"act:689867a5-ff8c-5081-a39f-fa0e75e227c2","@type":"skos:Concept","code":"CULT","naam":"Cultuur"}],"werkingsgebieden":[{"@id":"wg:beb2fab7-a255-5eac-986c-5363787e5a59","@type":"skos:Concept","code":"BE25","naam":"Provincie West-Vlaanderen"}],"doelgroep":{"@id":"doel:645893be-1cc0-5ec7-bcf6-13cd7f0e1b7d","@type":"verenigingen_ext:Doelgroep","minimumleeftijd":0,"maximumleeftijd":150},"locaties":[{"@id":"loc:6c906ef4-4b99-5e0d-94f2-01459f8bd44e","@type":"org:Site","locatietype":"Correspondentie","isPrimair":true,"adresvoorstelling":"kerkstraat 5, 1770 Liedekerke, België","naam":"","postcode":"1770","gemeente":"Liedekerke"}],"lidmaatschappen":[{"@id":"lidmaatschap:50120f03-e531-5a6d-8d05-431a6712892c","@type":"org:Membership","andereVereniging":"V0001002","van":"2024-08-04","tot":"2025-08-04","identificatie":"L1234","beschrijving":"Gewoon een lid"}],"sleutels":[{"@id":"identificatoren:b309b034-5770-560b-a71e-9f69cffde4b2","@type":"adms:Identifier","bron":"Vcode","waarde":"V0001001","codeerSysteem":"Vcode","gestructureerdeIdentificator":{"@id":"ges:ef70d668-d9b1-5eb5-ae90-d6aabe1d70a3","@type":"generiek:GestructureerdeIdentificator","nummer":"V0001001"}}],"relaties":[],"links":{"detail":"https://publiek.verenigingen.staging-vlaanderen.be/verenigingen/V0001001"}},{"@type":"fei:FeitelijkeVerenigingen","vCode":"V0036651","verenigingstype":{"code":"VZW","naam":"Vereniging zonder winstoogmerk"},"naam":"FWA De Bron","roepnaam":"Bronneke","korteNaam":"","korteBeschrijving":"","hoofdactiviteitenVerenigingsloket":[{"@id":"act:b47fd079-d692-5d91-8657-168aab04b498","@type":"skos:Concept","code":"SPRT","naam":"Sport"}],"werkingsgebieden":[{"@id":"wg:beb2fab7-a255-5eac-986c-5363787e5a59","@type":"skos:Concept","code":"BE25","naam":"Provincie West-Vlaanderen"}],"doelgroep":{"@id":"doel:3948061a-783d-5ffe-9b3e-db6538f8dac8","@type":"verenigingen_ext:Doelgroep","minimumleeftijd":0,"maximumleeftijd":150},"locaties":[{"@id":"loc:097631a2-a376-5ef3-8cfe-9978d3211aa2","@type":"org:Site","locatietype":"Activiteiten","isPrimair":false,"adresvoorstelling":"dorpstraat 91, 9000 Gent, België","naam":"Cursuszaal","postcode":"9000","gemeente":"Gent"}],"lidmaatschappen":[{"@id":"lidmaatschap:50120f03-e531-5a6d-8d05-431a6712892c","@type":"org:Membership","andereVereniging":"V0001002","van":"2024-08-04","tot":"2025-08-04","identificatie":"L1234","beschrijving":"Gewoon een lid"},{"@id":"lidmaatschap:c1ab2496-31b6-570d-aa51-a1ed0b6cb1a3","@type":"org:Membership","andereVereniging":"V0001003","van":"2025-03-04","tot":"2025-07-30","identificatie":"L4321","beschrijving":"Tijdelijk lidmaatschap"}],"sleutels":[{"@id":"identificatoren:643c36bc-28a5-5a74-9adc-cbdcc7268635","@type":"adms:Identifier","bron":"KBO","waarde":"0123456789","codeerSysteem":"KBO nummer","gestructureerdeIdentificator":{"@id":"ges:a492532d-f5af-5359-aefe-9f64b13deb39","@type":"generiek:GestructureerdeIdentificator","nummer":"0123456789"}},{"@id":"identificatoren:8f5fd362-2e38-55b6-a007-d80704e406a8","@type":"adms:Identifier","bron":"Vcode","waarde":"V0036651","codeerSysteem":"Vcode","gestructureerdeIdentificator":{"@id":"ges:590ed586-43aa-50ee-be3d-5acde470410b","@type":"generiek:GestructureerdeIdentificator","nummer":"V0036651"}}],"relaties":[],"links":{"detail":"https://publiek.verenigingen.staging-vlaanderen.be/verenigingen/V0036651"}}],"facets":{"hoofdactiviteitenVerenigingsloket":[{"code":"CULT","aantal":1,"query":"https://publiek.verenigingen.staging-vlaanderen.be/verenigingen/search/q=(hoofdactiviteitVerenigingsloket.code:CULT)"},{"code":"SPRT","aantal":1,"query":"https://publiek.verenigingen.staging-vlaanderen.be/verenigingen/search/q=(hoofdactiviteitVerenigingsloket.code:SPRT)"}]},"metadata":{"pagination":{"totalCount":2,"offset":0,"limit":50}}}
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Be.Vlaanderen.Basisregisters.BasicApiProblem.ProblemDetails"
+                },
+                "example": {"type":"urn:associationregistry.public.api:validation","title":"Er heeft zich een fout voorgedaan!","detail":"Beschrijving van het probleem","status":400,"instance":"https://publiek.verenigingen.staging-vlaanderen.be/v1/foutmeldingen/8d6924815a8e4cd2925d787efd69743d"}
+              }
+            }
+          },
+          "500": {
+            "description": "Er is een interne fout opgetreden.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Be.Vlaanderen.Basisregisters.BasicApiProblem.ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/verenigingen/{vCode}": {
+      "get": {
+        "tags": [
+          "Opvragen van verenigingen"
+        ],
+        "summary": "Vraag het detail van een vereniging op.",
+        "parameters": [
+          {
+            "name": "vCode",
+            "in": "path",
+            "description": "De unieke identificatie code van deze vereniging",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "vR-Api-Version",
+            "in": "header",
+            "description": "De versie van dit endpoint.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Het detail van een vereniging",
+            "content": {
+              "application/ld+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssociationRegistry.Public.Api.Verenigingen.Detail.ResponseModels.PubliekVerenigingDetailResponse"
+                },
+                "examples": {
+                  "Zonder versie header": {
+                    "value": {"@context":"https://publiek.verenigingen.staging-vlaanderen.be/v1/contexten/publiek/detail-vereniging-context.json","vereniging":{"@type":"fei:FeitelijkeVerenigingen","vCode":"V0001001","verenigingstype":{"code":"FV","naam":"Feitelijke vereniging"},"naam":"FWA De vrolijke BA’s","korteNaam":"DVB","korteBeschrijving":"De vereniging van de vrolijke BA's","startdatum":"2020-05-15","doelgroep":{"@id":"doel:645893be-1cc0-5ec7-bcf6-13cd7f0e1b7d","@type":"verenigingen_ext:Doelgroep","minimumleeftijd":0,"maximumleeftijd":150},"status":"Actief","contactgegevens":[{"@id":"cont:fcb2ca90-9b2b-5735-8004-5e0f227af7dd","@type":"schema:ContactPoint","contactgegeventype":"E-mail","waarde":"info@example.org","beschrijving":"Info","isPrimair":false}],"locaties":[{"@id":"loc:6c906ef4-4b99-5e0d-94f2-01459f8bd44e","@type":"org:Site","locatietype":"Correspondentie","isPrimair":true,"naam":"de kerk","adres":{"@id":"adressen:57e1a9c4-03a2-5fc2-9917-700d89fb7c69","@type":"locn:Address","straatnaam":"kerkstraat","huisnummer":"5","busnummer":null,"postcode":"1770","gemeente":"Liedekerke","land":"België"},"adresvoorstelling":"kerkstraat 5, 1770 Liedekerke, België","adresId":{"broncode":"AR","bronwaarde":"https://data.vlaanderen.be/id/adres/1"},"verwijstNaar":{"@id":"adressenregister:1","@type":"geregistreerdAdres"}}],"hoofdactiviteitenVerenigingsloket":[{"@id":"act:689867a5-ff8c-5081-a39f-fa0e75e227c2","@type":"skos:Concept","code":"CULT","naam":"Cultuur"}],"werkingsgebieden":[{"@id":"wg:3ae45f45-13af-5998-abf5-17dcd440427f","@type":"skos:Concept","code":"BE25","naam":"Provincie West-Vlaanderen"}],"sleutels":[{"@id":"identificatoren:b309b034-5770-560b-a71e-9f69cffde4b2","@type":"adms:Identifier","gestructureerdeIdentificator":{"@id":"ges:ef70d668-d9b1-5eb5-ae90-d6aabe1d70a3","@type":"generiek:GestructureerdeIdentificator","nummer":"V0001001"},"bron":"Vcode","waarde":"V0001001","codeerSysteem":"Vcode"}],"relaties":[],"lidmaatschappen":[{"@id":"lidmaatschap:50120f03-e531-5a6d-8d05-431a6712892c","@type":"org:Membership","andereVereniging":"V0001111","naam":"De andere vereniging","identificatie":"Een identificatie","beschrijving":"Een lidmaatschap","van":"2002-11-15","tot":"2002-11-16"}]},"metadata":{"datumLaatsteAanpassing":"2023-05-15"}}
+                  },
+                  "Versie 'v2'": {
+                    "value": {"@context":"https://publiek.verenigingen.staging-vlaanderen.be/v1/contexten/publiek/detail-vereniging-context.json","vereniging":{"@type":"fei:FeitelijkeVerenigingen","vCode":"V0001001","verenigingstype":{"code":"VZER","naam":"Vereniging zonder eigen rechtspersoonlijkheid"},"verenigingssubtype":{"code":"NB","naam":"Niet bepaald"},"naam":"FWA De vrolijke BA’s","korteNaam":"DVB","korteBeschrijving":"De vereniging van de vrolijke BA's","startdatum":"2020-05-15","doelgroep":{"@id":"doel:645893be-1cc0-5ec7-bcf6-13cd7f0e1b7d","@type":"verenigingen_ext:Doelgroep","minimumleeftijd":0,"maximumleeftijd":150},"status":"Actief","contactgegevens":[{"@id":"cont:fcb2ca90-9b2b-5735-8004-5e0f227af7dd","@type":"schema:ContactPoint","contactgegeventype":"E-mail","waarde":"info@example.org","beschrijving":"Info","isPrimair":false}],"locaties":[{"@id":"loc:6c906ef4-4b99-5e0d-94f2-01459f8bd44e","@type":"org:Site","locatietype":"Correspondentie","isPrimair":true,"naam":"de kerk","adres":{"@id":"adressen:57e1a9c4-03a2-5fc2-9917-700d89fb7c69","@type":"locn:Address","straatnaam":"kerkstraat","huisnummer":"5","busnummer":null,"postcode":"1770","gemeente":"Liedekerke","land":"België"},"adresvoorstelling":"kerkstraat 5, 1770 Liedekerke, België","adresId":{"broncode":"AR","bronwaarde":"https://data.vlaanderen.be/id/adres/1"},"verwijstNaar":{"@id":"adressenregister:1","@type":"geregistreerdAdres"}}],"hoofdactiviteitenVerenigingsloket":[{"@id":"act:689867a5-ff8c-5081-a39f-fa0e75e227c2","@type":"skos:Concept","code":"CULT","naam":"Cultuur"}],"werkingsgebieden":[{"@id":"wg:3ae45f45-13af-5998-abf5-17dcd440427f","@type":"skos:Concept","code":"BE25","naam":"Provincie West-Vlaanderen"}],"sleutels":[{"@id":"identificatoren:b309b034-5770-560b-a71e-9f69cffde4b2","@type":"adms:Identifier","gestructureerdeIdentificator":{"@id":"ges:ef70d668-d9b1-5eb5-ae90-d6aabe1d70a3","@type":"generiek:GestructureerdeIdentificator","nummer":"V0001001"},"bron":"Vcode","waarde":"V0001001","codeerSysteem":"Vcode"}],"relaties":[],"lidmaatschappen":[{"@id":"lidmaatschap:50120f03-e531-5a6d-8d05-431a6712892c","@type":"org:Membership","andereVereniging":"V0001111","naam":"De andere vereniging","identificatie":"Een identificatie","beschrijving":"Een lidmaatschap","van":"2002-11-15","tot":"2002-11-16"}]},"metadata":{"datumLaatsteAanpassing":"2023-05-15"}}
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Er is een interne fout opgetreden.",
+            "content": {
+              "application/ld+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Be.Vlaanderen.Basisregisters.BasicApiProblem.ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "De gevraagde vereniging is niet gevonden"
+          }
+        }
+      }
+    },
+    "/v1/werkingsgebieden": {
+      "get": {
+        "tags": [
+          "Parameters"
+        ],
+        "summary": "Vraag alle mogelijke waarden op voor de werkingsgebieden.",
+        "responses": {
+          "200": {
+            "description": "Een lijst met alle gekende werkingsgebieden.",
+            "content": {
+              "application/ld+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssociationRegistry.Public.Api.Werkingsgebieden.ResponseModels.WerkingsgebiedenResponse"
+                },
+                "example": [{"werkingsgebieden":[{"code":"BE10","naam":"Brussels Hoofdstedelijk Gewest"},{"code":"BE21","naam":"Provincie Antwerpen"},{"code":"BE22","naam":"Provincie Limburg"},{"code":"BE2411540","naam":"Pajottegem"},{"code":"BE2122223","naam":"Heist-op-den-Berg"}]}]
+              }
+            }
+          },
+          "500": {
+            "description": "Er is een interne fout opgetreden.",
+            "content": {
+              "application/ld+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Be.Vlaanderen.Basisregisters.BasicApiProblem.ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/hoofdactiviteitenVerenigingsloket": {
+      "get": {
+        "tags": [
+          "Parameters"
+        ],
+        "summary": "Vraag alle mogelijke waarden op voor de hoofdactiviteiten.",
+        "responses": {
+          "200": {
+            "description": "De gekende waarden voor hoofdactiviteit",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssociationRegistry.Public.Api.Hoofdactiviteiten.HoofdactiviteitenHoofdactiviteitenVerenigingsloketResponse"
+                },
+                "example": {"hoofdactiviteitenVerenigingsloket":[{"code":"BLA","naam":"Bijzonder Lange Afkortingen"}]}
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssociationRegistry.Public.Api.Hoofdactiviteiten.HoofdactiviteitenHoofdactiviteitenVerenigingsloketResponse"
+                },
+                "example": {"hoofdactiviteitenVerenigingsloket":[{"code":"BLA","naam":"Bijzonder Lange Afkortingen"}]}
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssociationRegistry.Public.Api.Hoofdactiviteiten.HoofdactiviteitenHoofdactiviteitenVerenigingsloketResponse"
+                },
+                "example": {"hoofdactiviteitenVerenigingsloket":[{"code":"BLA","naam":"Bijzonder Lange Afkortingen"}]}
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssociationRegistry.Public.Api.Hoofdactiviteiten.HoofdactiviteitenHoofdactiviteitenVerenigingsloketResponse"
+                },
+                "example": "<HoofdactiviteitenHoofdactiviteitenVerenigingsloketResponse xmlns:i=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns=\"http://schemas.datacontract.org/2004/07/AssociationRegistry.Public.Api.Hoofdactiviteiten\">\n  <HoofdactiviteitenVerenigingsloket>\n    <HoofdactiviteitenHoofdactiviteitenVerenigingsloketResponse.HoofdactiviteitVerenigingsloket>\n      <Code>BLA</Code>\n      <Naam>Bijzonder Lange Afkortingen</Naam>\n    </HoofdactiviteitenHoofdactiviteitenVerenigingsloketResponse.HoofdactiviteitVerenigingsloket>\n  </HoofdactiviteitenVerenigingsloket>\n</HoofdactiviteitenHoofdactiviteitenVerenigingsloketResponse>"
+              },
+              "text/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssociationRegistry.Public.Api.Hoofdactiviteiten.HoofdactiviteitenHoofdactiviteitenVerenigingsloketResponse"
+                },
+                "example": "<HoofdactiviteitenHoofdactiviteitenVerenigingsloketResponse xmlns:i=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns=\"http://schemas.datacontract.org/2004/07/AssociationRegistry.Public.Api.Hoofdactiviteiten\">\n  <HoofdactiviteitenVerenigingsloket>\n    <HoofdactiviteitenHoofdactiviteitenVerenigingsloketResponse.HoofdactiviteitVerenigingsloket>\n      <Code>BLA</Code>\n      <Naam>Bijzonder Lange Afkortingen</Naam>\n    </HoofdactiviteitenHoofdactiviteitenVerenigingsloketResponse.HoofdactiviteitVerenigingsloket>\n  </HoofdactiviteitenVerenigingsloket>\n</HoofdactiviteitenHoofdactiviteitenVerenigingsloketResponse>"
+              }
+            }
+          },
+          "500": {
+            "description": "Er is een interne fout opgetreden.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Be.Vlaanderen.Basisregisters.BasicApiProblem.ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Be.Vlaanderen.Basisregisters.BasicApiProblem.ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Be.Vlaanderen.Basisregisters.BasicApiProblem.ProblemDetails"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/Be.Vlaanderen.Basisregisters.BasicApiProblem.ProblemDetails"
+                }
+              },
+              "text/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/Be.Vlaanderen.Basisregisters.BasicApiProblem.ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AssociationRegistry.Public.Api.Hoofdactiviteiten.HoofdactiviteitenHoofdactiviteitenVerenigingsloketResponse": {
+        "type": "object",
+        "properties": {
+          "hoofdactiviteitenVerenigingsloket": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AssociationRegistry.Public.Api.Hoofdactiviteiten.HoofdactiviteitenHoofdactiviteitenVerenigingsloketResponse+HoofdactiviteitVerenigingsloket"
+            },
+            "description": "Alle hoofdactiviteiten volgens het Verenigingsloket"
+          }
+        },
+        "additionalProperties": false
+      },
+      "AssociationRegistry.Public.Api.Hoofdactiviteiten.HoofdactiviteitenHoofdactiviteitenVerenigingsloketResponse+HoofdactiviteitVerenigingsloket": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "De verkorte code van de hoofdactiviteit"
+          },
+          "naam": {
+            "type": "string",
+            "description": "De volledige beschrijving van de hoofdactiviteit"
+          }
+        },
+        "additionalProperties": false
+      },
+      "AssociationRegistry.Public.Api.Verenigingen.Detail.ResponseModels.Adres": {
+        "type": "object",
+        "properties": {
+          "@id": {
+            "type": "string",
+            "description": "De json-ld id"
+          },
+          "@type": {
+            "type": "string",
+            "description": "Het json-ld type"
+          },
+          "straatnaam": {
+            "type": "string",
+            "description": "De straat van de locatie"
+          },
+          "huisnummer": {
+            "type": "string",
+            "description": "Het huisnummer van de locatie"
+          },
+          "busnummer": {
+            "type": "string",
+            "description": "Het busnummer van de locatie",
+            "nullable": true
+          },
+          "postcode": {
+            "type": "string",
+            "description": "De postcode van de locatie"
+          },
+          "gemeente": {
+            "type": "string",
+            "description": "De gemeente van de locatie"
+          },
+          "land": {
+            "type": "string",
+            "description": "Het land van de locatie"
+          }
+        },
+        "additionalProperties": false
+      },
+      "AssociationRegistry.Public.Api.Verenigingen.Detail.ResponseModels.AdresId": {
+        "type": "object",
+        "properties": {
+          "broncode": {
+            "type": "string",
+            "description": "De identificator voor dit adres bij de Adresbron",
+            "nullable": true
+          },
+          "bronwaarde": {
+            "type": "string",
+            "description": "De bron waar het AdresId naar verwijst",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "AssociationRegistry.Public.Api.Verenigingen.Detail.ResponseModels.AdresVerwijzing": {
+        "type": "object",
+        "properties": {
+          "@id": {
+            "type": "string",
+            "description": "De json-ld id"
+          },
+          "@type": {
+            "type": "string",
+            "description": "Het json-ld type"
+          }
+        },
+        "additionalProperties": false
+      },
+      "AssociationRegistry.Public.Api.Verenigingen.Detail.ResponseModels.Contactgegeven": {
+        "type": "object",
+        "properties": {
+          "@id": {
+            "type": "string",
+            "description": "De json-ld id"
+          },
+          "@type": {
+            "type": "string",
+            "description": "Het json-ld type"
+          },
+          "contactgegeventype": {
+            "type": "string",
+            "description": "Het type contactgegeven"
+          },
+          "waarde": {
+            "type": "string",
+            "description": "De waarde van het contactgegeven"
+          },
+          "beschrijving": {
+            "type": "string",
+            "description": "Vrij veld die het het contactgegeven beschrijft (bijv: algemeen, administratie, ...)"
+          },
+          "isPrimair": {
+            "type": "boolean",
+            "description": "Duidt het contactgegeven aan als primair contactgegeven"
+          }
+        },
+        "additionalProperties": false
+      },
+      "AssociationRegistry.Public.Api.Verenigingen.Detail.ResponseModels.DoelgroepResponse": {
+        "type": "object",
+        "properties": {
+          "@id": {
+            "type": "string",
+            "description": "De json-ld id"
+          },
+          "@type": {
+            "type": "string",
+            "description": "Het json-ld type"
+          },
+          "minimumleeftijd": {
+            "type": "integer",
+            "description": "De minimum leeftijd voor de doelgroep",
+            "format": "int32"
+          },
+          "maximumleeftijd": {
+            "type": "integer",
+            "description": "De maximum leeftijd voor de doelgroep",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false,
+        "description": "De doelgroep waar de activiteiten van deze vereniging zich op concentreert"
+      },
+      "AssociationRegistry.Public.Api.Verenigingen.Detail.ResponseModels.GestructureerdeIdentificator": {
+        "type": "object",
+        "properties": {
+          "@id": {
+            "type": "string",
+            "description": "De json-ld id"
+          },
+          "@type": {
+            "type": "string",
+            "description": "Het json-ld type"
+          },
+          "nummer": {
+            "type": "string",
+            "description": "De externe identificator van de vereniging in de bron"
+          }
+        },
+        "additionalProperties": false
+      },
+      "AssociationRegistry.Public.Api.Verenigingen.Detail.ResponseModels.HoofdactiviteitVerenigingsloket": {
+        "type": "object",
+        "properties": {
+          "@id": {
+            "type": "string",
+            "description": "De json-ld id"
+          },
+          "@type": {
+            "type": "string",
+            "description": "Het json-ld type"
+          },
+          "code": {
+            "type": "string",
+            "description": "De code van de hoofdactivititeit"
+          },
+          "naam": {
+            "type": "string",
+            "description": "De beschrijving van de hoofdactivititeit"
+          }
+        },
+        "additionalProperties": false
+      },
+      "AssociationRegistry.Public.Api.Verenigingen.Detail.ResponseModels.Lidmaatschap": {
+        "type": "object",
+        "properties": {
+          "@id": {
+            "type": "string",
+            "description": "De json-ld id"
+          },
+          "@type": {
+            "type": "string",
+            "description": "Het json-ld type"
+          },
+          "andereVereniging": {
+            "type": "string",
+            "description": "De unieke identificator van de vereniging waarvan deze vereniging lid werd"
+          },
+          "naam": {
+            "type": "string",
+            "description": "De naam van de gerelateerde vereniging"
+          },
+          "identificatie": {
+            "type": "string",
+            "description": "De identificatie van het lidmaatschap"
+          },
+          "beschrijving": {
+            "type": "string",
+            "description": "De beschrijving van het lidmaatschap"
+          },
+          "van": {
+            "type": "string",
+            "description": "De datum waarop het lidmaatschap start"
+          },
+          "tot": {
+            "type": "string",
+            "description": "De datum waarop het lidmaatschap stopt"
+          }
+        },
+        "additionalProperties": false
+      },
+      "AssociationRegistry.Public.Api.Verenigingen.Detail.ResponseModels.Locatie": {
+        "type": "object",
+        "properties": {
+          "@id": {
+            "type": "string",
+            "description": "De json-ld id"
+          },
+          "@type": {
+            "type": "string",
+            "description": "Het json-ld type"
+          },
+          "locatietype": {
+            "type": "string",
+            "description": "Het soort locatie dat beschreven wordt<br /><br />\r\nMogelijke waarden:<br />\r\n- Activiteiten<br />\r\n- Correspondentie - Slechts één maal mogelijk<br />\r\n- Maatschappelijke zetel volgens KBO - Enkel mogelijk voor verenigingen met rechtspersoonlijkheid<br />"
+          },
+          "isPrimair": {
+            "type": "boolean",
+            "description": "Duidt aan dat dit de primaire locatie is"
+          },
+          "naam": {
+            "type": "string",
+            "description": "Een beschrijvende naam voor de locatie",
+            "nullable": true
+          },
+          "adres": {
+            "$ref": "#/components/schemas/AssociationRegistry.Public.Api.Verenigingen.Detail.ResponseModels.Adres"
+          },
+          "adresvoorstelling": {
+            "type": "string",
+            "description": "Een standaard geformatteerde weergave van het adres van de locatie"
+          },
+          "adresId": {
+            "$ref": "#/components/schemas/AssociationRegistry.Public.Api.Verenigingen.Detail.ResponseModels.AdresId"
+          },
+          "verwijstNaar": {
+            "$ref": "#/components/schemas/AssociationRegistry.Public.Api.Verenigingen.Detail.ResponseModels.AdresVerwijzing"
+          }
+        },
+        "additionalProperties": false
+      },
+      "AssociationRegistry.Public.Api.Verenigingen.Detail.ResponseModels.Metadata": {
+        "type": "object",
+        "properties": {
+          "datumLaatsteAanpassing": {
+            "type": "string",
+            "description": "De datum waarop de laatste aanpassing uitgevoerd is op de gegevens van de vereniging"
+          }
+        },
+        "additionalProperties": false
+      },
+      "AssociationRegistry.Public.Api.Verenigingen.Detail.ResponseModels.PubliekVerenigingDetailResponse": {
+        "type": "object",
+        "properties": {
+          "@context": {
+            "type": "string",
+            "description": "De JSON-LD open data context"
+          },
+          "vereniging": {
+            "$ref": "#/components/schemas/AssociationRegistry.Public.Api.Verenigingen.Detail.ResponseModels.Vereniging"
+          },
+          "metadata": {
+            "$ref": "#/components/schemas/AssociationRegistry.Public.Api.Verenigingen.Detail.ResponseModels.Metadata"
+          }
+        },
+        "additionalProperties": false
+      },
+      "AssociationRegistry.Public.Api.Verenigingen.Detail.ResponseModels.Relatie": {
+        "type": "object",
+        "properties": {
+          "relatietype": {
+            "type": "string",
+            "description": "Het type relatie"
+          },
+          "andereVereniging": {
+            "$ref": "#/components/schemas/AssociationRegistry.Public.Api.Verenigingen.Detail.ResponseModels.Relatie+GerelateerdeVereniging"
+          }
+        },
+        "additionalProperties": false
+      },
+      "AssociationRegistry.Public.Api.Verenigingen.Detail.ResponseModels.Relatie+GerelateerdeVereniging": {
+        "type": "object",
+        "properties": {
+          "kboNummer": {
+            "type": "string",
+            "description": "Het KBO nummer van de gerelateerde vereniging"
+          },
+          "vCode": {
+            "type": "string",
+            "description": "De unieke identificator van de gerelateerde vereniging in het verenigingsregister"
+          },
+          "naam": {
+            "type": "string",
+            "description": "De naam van de gerelateerde vereniging"
+          },
+          "detail": {
+            "type": "string",
+            "description": "De link naar het publiek detail van de gerelateerde vereniging"
+          }
+        },
+        "additionalProperties": false
+      },
+      "AssociationRegistry.Public.Api.Verenigingen.Detail.ResponseModels.Sleutel": {
+        "type": "object",
+        "properties": {
+          "@id": {
+            "type": "string",
+            "description": "De json-ld id"
+          },
+          "@type": {
+            "type": "string",
+            "description": "Het json-ld type"
+          },
+          "gestructureerdeIdentificator": {
+            "$ref": "#/components/schemas/AssociationRegistry.Public.Api.Verenigingen.Detail.ResponseModels.GestructureerdeIdentificator"
+          },
+          "bron": {
+            "type": "string",
+            "description": "De bron van de sleutel"
+          },
+          "waarde": {
+            "type": "string",
+            "description": "De externe identificator van de vereniging in de bron"
+          },
+          "codeerSysteem": {
+            "type": "string",
+            "description": "het codeersysteem van de sleutel"
+          }
+        },
+        "additionalProperties": false
+      },
+      "AssociationRegistry.Public.Api.Verenigingen.Detail.ResponseModels.SubverenigingVan": {
+        "type": "object",
+        "properties": {
+          "andereVereniging": {
+            "type": "string",
+            "description": "De unieke identificator van de vereniging waarvan deze vereniging een subvereniging werd"
+          },
+          "naam": {
+            "type": "string",
+            "description": "De naam van de gerelateerde vereniging"
+          },
+          "identificatie": {
+            "type": "string",
+            "description": "De identificatie van het subtype"
+          },
+          "beschrijving": {
+            "type": "string",
+            "description": "De beschrijving van het subtype vereniging"
+          }
+        },
+        "additionalProperties": false
+      },
+      "AssociationRegistry.Public.Api.Verenigingen.Detail.ResponseModels.Vereniging": {
+        "type": "object",
+        "properties": {
+          "@type": {
+            "type": "string",
+            "description": "Het json-ld type"
+          },
+          "vCode": {
+            "type": "string",
+            "description": "De unieke identificatie code van deze vereniging"
+          },
+          "verenigingstype": {
+            "$ref": "#/components/schemas/AssociationRegistry.Public.Api.Verenigingen.Detail.ResponseModels.Verenigingstype"
+          },
+          "verenigingssubtype": {
+            "$ref": "#/components/schemas/AssociationRegistry.Public.Api.Verenigingen.Detail.ResponseModels.Verenigingssubtype"
+          },
+          "subverenigingVan": {
+            "$ref": "#/components/schemas/AssociationRegistry.Public.Api.Verenigingen.Detail.ResponseModels.SubverenigingVan"
+          },
+          "naam": {
+            "type": "string",
+            "description": "Naam van de vereniging"
+          },
+          "roepnaam": {
+            "type": "string",
+            "description": "Roepnaam van de vereniging. Dit veld is enkel aanwezig bij verenigingen met rechtspersoonlijkheid",
+            "default": null,
+            "nullable": true
+          },
+          "korteNaam": {
+            "type": "string",
+            "description": "Korte naam van de vereniging",
+            "nullable": true
+          },
+          "korteBeschrijving": {
+            "type": "string",
+            "description": "Korte beschrijving van de vereniging",
+            "nullable": true
+          },
+          "startdatum": {
+            "pattern": "yyyy-MM-dd",
+            "type": "string",
+            "description": "Datum waarop de vereniging gestart is. Deze datum mag niet later zijn dan vandaag",
+            "format": "date",
+            "nullable": true
+          },
+          "doelgroep": {
+            "$ref": "#/components/schemas/AssociationRegistry.Public.Api.Verenigingen.Detail.ResponseModels.DoelgroepResponse"
+          },
+          "status": {
+            "type": "string",
+            "description": "Status van de vereniging"
+          },
+          "contactgegevens": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AssociationRegistry.Public.Api.Verenigingen.Detail.ResponseModels.Contactgegeven"
+            },
+            "description": "De contactgegevens van deze vereniging"
+          },
+          "locaties": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AssociationRegistry.Public.Api.Verenigingen.Detail.ResponseModels.Locatie"
+            },
+            "description": "Alle locaties waar deze vereniging actief is"
+          },
+          "hoofdactiviteitenVerenigingsloket": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AssociationRegistry.Public.Api.Verenigingen.Detail.ResponseModels.HoofdactiviteitVerenigingsloket"
+            },
+            "description": "De hoofdactivititeiten van deze vereniging volgens het verenigingsloket"
+          },
+          "werkingsgebieden": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AssociationRegistry.Public.Api.Verenigingen.Detail.ResponseModels.Werkingsgebied"
+            },
+            "description": "De werkingsgebieden van deze vereniging"
+          },
+          "sleutels": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AssociationRegistry.Public.Api.Verenigingen.Detail.ResponseModels.Sleutel"
+            },
+            "description": "De sleutels die deze vereniging beheren"
+          },
+          "relaties": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AssociationRegistry.Public.Api.Verenigingen.Detail.ResponseModels.Relatie"
+            },
+            "description": "De relaties van deze vereniging"
+          },
+          "lidmaatschappen": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AssociationRegistry.Public.Api.Verenigingen.Detail.ResponseModels.Lidmaatschap"
+            },
+            "description": "De lidmaatschappen van deze vereniging"
+          }
+        },
+        "additionalProperties": false
+      },
+      "AssociationRegistry.Public.Api.Verenigingen.Detail.ResponseModels.Verenigingssubtype": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "De code van het subtype vereniging"
+          },
+          "naam": {
+            "type": "string",
+            "description": "De beschrijving van het subtype vereniging"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Het subtype van de vereniging"
+      },
+      "AssociationRegistry.Public.Api.Verenigingen.Detail.ResponseModels.Verenigingstype": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "Code van het type vereniging"
+          },
+          "naam": {
+            "type": "string",
+            "description": "Beschrijving van het type vereniging"
+          }
+        },
+        "additionalProperties": false
+      },
+      "AssociationRegistry.Public.Api.Verenigingen.Detail.ResponseModels.Werkingsgebied": {
+        "type": "object",
+        "properties": {
+          "@id": {
+            "type": "string",
+            "description": "De json-ld id"
+          },
+          "@type": {
+            "type": "string",
+            "description": "Het json-ld type"
+          },
+          "code": {
+            "type": "string",
+            "description": "De code van het werkingsgebied"
+          },
+          "naam": {
+            "type": "string",
+            "description": "De beschrijving van het werkingsgebied"
+          }
+        },
+        "additionalProperties": false
+      },
+      "AssociationRegistry.Public.Api.Verenigingen.Mutaties.PubliekVerenigingSequenceResponse": {
+        "type": "object",
+        "properties": {
+          "vCode": {
+            "type": "string",
+            "description": "De vcode van de vereniging"
+          },
+          "sequence": {
+            "type": "integer",
+            "description": "De sequence van de vereniging",
+            "format": "int64"
+          }
+        },
+        "additionalProperties": false
+      },
+      "AssociationRegistry.Public.Api.Verenigingen.Search.ResponseModels.DoelgroepResponse": {
+        "type": "object",
+        "properties": {
+          "@id": {
+            "type": "string",
+            "description": "De json-ld id"
+          },
+          "@type": {
+            "type": "string",
+            "description": "Het json-ld type"
+          },
+          "minimumleeftijd": {
+            "type": "integer",
+            "description": "De minimum leeftijd voor de doelgroep",
+            "format": "int32"
+          },
+          "maximumleeftijd": {
+            "type": "integer",
+            "description": "De maximum leeftijd voor de doelgroep",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false,
+        "description": "De doelgroep waar de activiteiten van deze vereniging zich op concentreert"
+      },
+      "AssociationRegistry.Public.Api.Verenigingen.Search.ResponseModels.Facets": {
+        "type": "object",
+        "properties": {
+          "hoofdactiviteitenVerenigingsloket": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AssociationRegistry.Public.Api.Verenigingen.Search.ResponseModels.HoofdactiviteitVerenigingsloketFacetItem"
+            },
+            "description": "De hoofdactivititeiten van deze vereniging volgens het verenigingsloket"
+          }
+        },
+        "additionalProperties": false
+      },
+      "AssociationRegistry.Public.Api.Verenigingen.Search.ResponseModels.GestructureerdeIdentificator": {
+        "type": "object",
+        "properties": {
+          "@id": {
+            "type": "string",
+            "description": "De json-ld id"
+          },
+          "@type": {
+            "type": "string",
+            "description": "Het json-ld type"
+          },
+          "nummer": {
+            "type": "string",
+            "description": "De externe identificator van de vereniging in de bron"
+          }
+        },
+        "additionalProperties": false
+      },
+      "AssociationRegistry.Public.Api.Verenigingen.Search.ResponseModels.HoofdactiviteitVerenigingsloket": {
+        "type": "object",
+        "properties": {
+          "@id": {
+            "type": "string",
+            "description": "De json-ld id"
+          },
+          "@type": {
+            "type": "string",
+            "description": "Het json-ld type"
+          },
+          "code": {
+            "type": "string",
+            "description": "De verkorte code van de hoofdactiviteit"
+          },
+          "naam": {
+            "type": "string",
+            "description": "De volledige beschrijving van de hoofdactiviteit"
+          }
+        },
+        "additionalProperties": false
+      },
+      "AssociationRegistry.Public.Api.Verenigingen.Search.ResponseModels.HoofdactiviteitVerenigingsloketFacetItem": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "De code van de hoofdactiviteit"
+          },
+          "aantal": {
+            "type": "integer",
+            "description": "Het aantal gevonden verenigingen met deze hoofdactiviteit",
+            "format": "int64"
+          },
+          "query": {
+            "type": "string",
+            "description": "De query die kan uitgevoerd worden om te filteren op deze waarde"
+          }
+        },
+        "additionalProperties": false
+      },
+      "AssociationRegistry.Public.Api.Verenigingen.Search.ResponseModels.Lidmaatschap": {
+        "type": "object",
+        "properties": {
+          "@id": {
+            "type": "string",
+            "description": "De json-ld id"
+          },
+          "@type": {
+            "type": "string",
+            "description": "Het json-ld type"
+          },
+          "andereVereniging": {
+            "type": "string",
+            "description": "De vCode van de andere vereniging"
+          },
+          "van": {
+            "type": "string",
+            "description": "De datum waarop het lidmaatschap actief is",
+            "nullable": true
+          },
+          "tot": {
+            "type": "string",
+            "description": "De datum waarop het lidmaatschap niet meer actief is",
+            "nullable": true
+          },
+          "identificatie": {
+            "type": "string",
+            "description": "De externe identificatie voor het lidmaatschap",
+            "nullable": true
+          },
+          "beschrijving": {
+            "type": "string",
+            "description": "De externe beschrijving van het lidmaatschap",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "AssociationRegistry.Public.Api.Verenigingen.Search.ResponseModels.Locatie": {
+        "type": "object",
+        "properties": {
+          "@id": {
+            "type": "string",
+            "description": "De json-ld id"
+          },
+          "@type": {
+            "type": "string",
+            "description": "Het json-ld type"
+          },
+          "locatietype": {
+            "type": "string",
+            "description": "Het soort locatie dat beschreven wordt<br /><br />\r\nMogelijke waarden:<br />\r\n- Activiteiten<br />\r\n- Correspondentie - Slechts één maal mogelijk<br />\r\n- Maatschappelijke zetel volgens KBO - Enkel mogelijk voor verenigingen met rechtspersoonlijkheid<br />"
+          },
+          "isPrimair": {
+            "type": "boolean",
+            "description": "Is dit de primaire locatie van deze vereniging"
+          },
+          "adresvoorstelling": {
+            "type": "string",
+            "description": "De volledige adresvoorstelling van de locatie"
+          },
+          "naam": {
+            "type": "string",
+            "description": "De naam van de locatie",
+            "nullable": true
+          },
+          "postcode": {
+            "type": "string",
+            "description": "De postcode van de locatie"
+          },
+          "gemeente": {
+            "type": "string",
+            "description": "De gemeente waarin de locatie ligt"
+          }
+        },
+        "additionalProperties": false
+      },
+      "AssociationRegistry.Public.Api.Verenigingen.Search.ResponseModels.Metadata": {
+        "type": "object",
+        "properties": {
+          "pagination": {
+            "$ref": "#/components/schemas/AssociationRegistry.Public.Api.Verenigingen.Search.ResponseModels.Pagination"
+          }
+        },
+        "additionalProperties": false,
+        "description": "In deze metadata plaatsen we alle relevante metadata voor de zoekopdracht, de paginering informatie"
+      },
+      "AssociationRegistry.Public.Api.Verenigingen.Search.ResponseModels.Pagination": {
+        "type": "object",
+        "properties": {
+          "totalCount": {
+            "type": "integer",
+            "description": "Het totaal aantal verenigingen dat voldoet aan de zoekcriteria",
+            "format": "int64"
+          },
+          "offset": {
+            "type": "integer",
+            "description": "Het aantal overgeslagen resultaten",
+            "format": "int32"
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Het maximum aantal teruggegeven resultaten",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "AssociationRegistry.Public.Api.Verenigingen.Search.ResponseModels.Relatie": {
+        "type": "object",
+        "properties": {
+          "relatietype": {
+            "type": "string",
+            "description": "Het type relatie"
+          },
+          "andereVereniging": {
+            "$ref": "#/components/schemas/AssociationRegistry.Public.Api.Verenigingen.Search.ResponseModels.Relatie+GerelateerdeVereniging"
+          }
+        },
+        "additionalProperties": false
+      },
+      "AssociationRegistry.Public.Api.Verenigingen.Search.ResponseModels.Relatie+GerelateerdeVereniging": {
+        "type": "object",
+        "properties": {
+          "kboNummer": {
+            "type": "string",
+            "description": "Het KBO nummer van de gerelateerde vereniging"
+          },
+          "vCode": {
+            "type": "string",
+            "description": "De unieke identificator van de gerelateerde vereniging in het verenigingsregister"
+          },
+          "naam": {
+            "type": "string",
+            "description": "De naam van de gerelateerde vereniging"
+          },
+          "detail": {
+            "type": "string",
+            "description": "De link naar het publiek detail van de gerelateerde vereniging"
+          }
+        },
+        "additionalProperties": false
+      },
+      "AssociationRegistry.Public.Api.Verenigingen.Search.ResponseModels.SearchVerenigingenResponse": {
+        "type": "object",
+        "properties": {
+          "@context": {
+            "type": "string",
+            "description": "De JSON-LD open data context"
+          },
+          "verenigingen": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AssociationRegistry.Public.Api.Verenigingen.Search.ResponseModels.Vereniging"
+            },
+            "description": "Dit is de lijst van verenigingen die het resultaat van de zoekopdracht zijn"
+          },
+          "facets": {
+            "$ref": "#/components/schemas/AssociationRegistry.Public.Api.Verenigingen.Search.ResponseModels.Facets"
+          },
+          "metadata": {
+            "$ref": "#/components/schemas/AssociationRegistry.Public.Api.Verenigingen.Search.ResponseModels.Metadata"
+          }
+        },
+        "additionalProperties": false
+      },
+      "AssociationRegistry.Public.Api.Verenigingen.Search.ResponseModels.Sleutel": {
+        "type": "object",
+        "properties": {
+          "@id": {
+            "type": "string",
+            "description": "De json-ld id"
+          },
+          "@type": {
+            "type": "string",
+            "description": "Het json-ld type"
+          },
+          "bron": {
+            "type": "string",
+            "description": "De bron van de sleutel"
+          },
+          "waarde": {
+            "type": "string",
+            "description": "De externe identificator van de vereniging in de bron"
+          },
+          "codeerSysteem": {
+            "type": "string",
+            "description": "het codeersysteem van de sleutel"
+          },
+          "gestructureerdeIdentificator": {
+            "$ref": "#/components/schemas/AssociationRegistry.Public.Api.Verenigingen.Search.ResponseModels.GestructureerdeIdentificator"
+          }
+        },
+        "additionalProperties": false
+      },
+      "AssociationRegistry.Public.Api.Verenigingen.Search.ResponseModels.SubverenigingVan": {
+        "type": "object",
+        "properties": {
+          "andereVereniging": {
+            "type": "string",
+            "description": "De unieke identificator van de vereniging waarvan deze vereniging een subvereniging werd"
+          },
+          "identificatie": {
+            "type": "string",
+            "description": "De identificatie van het subtype"
+          },
+          "beschrijving": {
+            "type": "string",
+            "description": "De beschrijving van het subtype vereniging"
+          }
+        },
+        "additionalProperties": false
+      },
+      "AssociationRegistry.Public.Api.Verenigingen.Search.ResponseModels.Vereniging": {
+        "type": "object",
+        "properties": {
+          "@type": {
+            "type": "string",
+            "description": "Het json-ld type"
+          },
+          "vCode": {
+            "type": "string",
+            "description": "De vCode van de vereniging"
+          },
+          "verenigingstype": {
+            "$ref": "#/components/schemas/AssociationRegistry.Public.Api.Verenigingen.Search.ResponseModels.VerenigingsType"
+          },
+          "verenigingssubtype": {
+            "$ref": "#/components/schemas/AssociationRegistry.Public.Api.Verenigingen.Search.ResponseModels.Verenigingssubtype"
+          },
+          "subverenigingVan": {
+            "$ref": "#/components/schemas/AssociationRegistry.Public.Api.Verenigingen.Search.ResponseModels.SubverenigingVan"
+          },
+          "naam": {
+            "type": "string",
+            "description": "De naam van de vereniging"
+          },
+          "roepnaam": {
+            "type": "string",
+            "description": "Roepnaam van de vereniging. Dit veld is enkel aanwezig bij verenigingen met rechtspersoonlijkheid",
+            "default": null,
+            "nullable": true
+          },
+          "korteNaam": {
+            "type": "string",
+            "description": "De korte naam van de vereniging"
+          },
+          "korteBeschrijving": {
+            "type": "string",
+            "description": "Korte beschrijving van de vereniging"
+          },
+          "hoofdactiviteitenVerenigingsloket": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AssociationRegistry.Public.Api.Verenigingen.Search.ResponseModels.HoofdactiviteitVerenigingsloket"
+            },
+            "description": "De lijst van hoofdactiviteiten erkend door het vereningingsloket"
+          },
+          "werkingsgebieden": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AssociationRegistry.Public.Api.Verenigingen.Search.ResponseModels.Werkingsgebied"
+            },
+            "description": "De lijst van werkingsgebieden"
+          },
+          "doelgroep": {
+            "$ref": "#/components/schemas/AssociationRegistry.Public.Api.Verenigingen.Search.ResponseModels.DoelgroepResponse"
+          },
+          "locaties": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AssociationRegistry.Public.Api.Verenigingen.Search.ResponseModels.Locatie"
+            },
+            "description": "De locaties waar de vereniging actief is"
+          },
+          "lidmaatschappen": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AssociationRegistry.Public.Api.Verenigingen.Search.ResponseModels.Lidmaatschap"
+            },
+            "description": "De lidmaatschappen van de vereniging"
+          },
+          "sleutels": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AssociationRegistry.Public.Api.Verenigingen.Search.ResponseModels.Sleutel"
+            },
+            "description": "De sleutels van deze vereniging"
+          },
+          "relaties": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AssociationRegistry.Public.Api.Verenigingen.Search.ResponseModels.Relatie"
+            },
+            "description": "De relaties van deze vereniging"
+          },
+          "links": {
+            "$ref": "#/components/schemas/AssociationRegistry.Public.Api.Verenigingen.Search.ResponseModels.VerenigingLinks"
+          }
+        },
+        "additionalProperties": false
+      },
+      "AssociationRegistry.Public.Api.Verenigingen.Search.ResponseModels.VerenigingLinks": {
+        "type": "object",
+        "properties": {
+          "detail": {
+            "type": "string",
+            "description": "De link naar het publiek detail van de vereniging",
+            "format": "uri"
+          }
+        },
+        "additionalProperties": false
+      },
+      "AssociationRegistry.Public.Api.Verenigingen.Search.ResponseModels.Verenigingssubtype": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "De code van het subtype vereniging"
+          },
+          "naam": {
+            "type": "string",
+            "description": "De beschrijving van het subtype vereniging"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Het subtype van de vereniging"
+      },
+      "AssociationRegistry.Public.Api.Verenigingen.Search.ResponseModels.VerenigingsType": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "De code van het type vereniging"
+          },
+          "naam": {
+            "type": "string",
+            "description": "De beschrijving van het type vereniging"
+          }
+        },
+        "additionalProperties": false
+      },
+      "AssociationRegistry.Public.Api.Verenigingen.Search.ResponseModels.Werkingsgebied": {
+        "type": "object",
+        "properties": {
+          "@id": {
+            "type": "string",
+            "description": "De json-ld id"
+          },
+          "@type": {
+            "type": "string",
+            "description": "Het json-ld type"
+          },
+          "code": {
+            "type": "string",
+            "description": "De code van het werkgebied"
+          },
+          "naam": {
+            "type": "string",
+            "description": "De beschrijving van het werkgebied"
+          }
+        },
+        "additionalProperties": false
+      },
+      "AssociationRegistry.Public.Api.Werkingsgebieden.ResponseModels.Werkingsgebied": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "De code van het werkingsgebied"
+          },
+          "naam": {
+            "type": "string",
+            "description": "De beschrijving van het werkingsgebied"
+          }
+        },
+        "additionalProperties": false
+      },
+      "AssociationRegistry.Public.Api.Werkingsgebieden.ResponseModels.WerkingsgebiedenResponse": {
+        "type": "object",
+        "properties": {
+          "werkingsgebieden": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AssociationRegistry.Public.Api.Werkingsgebieden.ResponseModels.Werkingsgebied"
+            },
+            "description": "Alle werkingsgebieden"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Be.Vlaanderen.Basisregisters.BasicApiProblem.ProblemDetails": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "URI referentie die het probleem type bepaalt."
+          },
+          "title": {
+            "type": "string",
+            "description": "Korte omschrijving van het probleem."
+          },
+          "detail": {
+            "type": "string",
+            "description": "Specifieke details voor dit probleem."
+          },
+          "status": {
+            "type": "integer",
+            "description": "HTTP status code komende van de server voor dit probleem.",
+            "format": "int32"
+          },
+          "instance": {
+            "type": "string",
+            "description": "URI naar de specifieke instantie van dit probleem."
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  }
+}
