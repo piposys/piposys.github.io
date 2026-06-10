@@ -1,0 +1,35 @@
+!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>eForms iframe test</title>
+  </head>
+
+  <body style="background-color: #f6f9fc">
+    ​
+    <h1>The iframe element</h1>
+    ​
+    <iframe
+      id="iframe" width="1500" height="500"
+      src="https://dv.formulieren.vlaanderen.be/content/forms/af/vlaamse-overheid/agentschap-onderwijsdiensten/arbeidsongevallen/secured/ao-start.html"
+    ></iframe>
+
+
+    <script type="text/javascript">
+      window.addEventListener("message", (event) => {
+        if (event.data.action === "WINDOW_RESIZED") {
+          console.log(
+            "event data width",
+            event.data.width,
+            "height",
+            event.data.height,
+          );
+          document.getElementById("iframe").width = event.data.width;
+          document.getElementById("iframe").height = event.data.height;
+        }
+      });
+    </script>
+
+  </body>
+</html>
